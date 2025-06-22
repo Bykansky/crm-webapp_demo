@@ -18,80 +18,100 @@
       padding: 30px;
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
-      position: relative;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
     }
     input, button {
       width: 100%;
       margin-top: 10px;
-      padding: 12px;
-      font-size: 1rem;
+      padding: 10px;
+      font-size: 1em;
       border-radius: 8px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
     }
     button {
       background: #4CAF50;
       color: white;
-      font-weight: bold;
-      cursor: pointer;
       border: none;
-      transition: background 0.3s ease;
+      cursor: pointer;
+      transition: background 0.3s;
     }
     button:hover {
       background: #45a049;
     }
-    .success-message {
+
+    #toast {
       display: none;
-      margin-top: 20px;
-      padding: 15px;
-      background-color: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-      border-radius: 8px;
-      animation: fadeIn 0.7s ease-in-out;
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background-color: #4CAF50;
+      color: white;
+      padding: 14px 24px;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      animation: fadeInOut 3s ease-in-out forwards;
+      z-index: 1000;
     }
-    .success-message.show {
-      display: block;
+
+    @keyframes fadeInOut {
+      0% { opacity: 0; top: 0px; }
+      10% { opacity: 1; top: 20px; }
+      90% { opacity: 1; top: 20px; }
+      100% { opacity: 0; top: 0px; }
     }
-    @keyframes fadeIn {
-      0% { opacity: 0; transform: translateY(-10px); }
-      100% { opacity: 1; transform: translateY(0); }
+
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
     }
   </style>
 </head>
 <body>
+  <div id="toast">✅ Данные успешно отправлены!</div>
   <div class="container">
-    <h2 style="text-align: center;">Ввод данных клиента</h2>
-    <input type="text" id="name" placeholder="Имя" required>
-    <input type="text" id="phone" placeholder="Телефон" required>
-    <input type="email" id="email" placeholder="Email" required>
-    <button onclick="submitData()">Отправить</button>
-    <div id="success" class="success-message">
-      ✅ Данные успешно сохранены!
-    </div>
+    <h1>Ввод данных клиента</h1>
+    <input type="text" id="name" placeholder="Имя">
+    <input type="tel" id="phone" placeholder="Телефон">
+    <input type="email" id="email" placeholder="Email">
+    <button onclick="sendData()">Отправить</button>
   </div>
 
   <script>
-    function submitData() {
-      const name = document.getElementById("name").value.trim();
-      const phone = document.getElementById("phone").value.trim();
-      const email = document.getElementById("email").value.trim();
+    function showToast() {
+      const toast = document.getElementById('toast');
+      toast.style.display = 'block';
+      setTimeout(() => {
+        toast.style.display = 'none';
+      }, 3000);
+    }
+
+    function sendData() {
+      const name = document.getElementById('name').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
 
       if (!name || !phone || !email) {
-        alert("Пожалуйста, заполните все поля.");
+        alert('Пожалуйста, заполните все поля!');
         return;
       }
 
-      const data = `${name} | ${phone} | ${email}`;
-      if (window.Telegram.WebApp) {
-        window.Telegram.WebApp.sendData(data);
-        document.getElementById("success").classList.add("show");
-        setTimeout(() => {
-          document.getElementById("success").classList.remove("show");
-          window.Telegram.WebApp.close();
-        }, 2000);
-      }
+      const button = document.querySelector('button');
+      button.classList.add('loading');
+      button.innerText = 'Отправка...';
+
+      setTimeout(() => {
+        Telegram.WebApp.sendData(`${name} | ${phone} | ${email}`);
+        showToast();
+        button.classList.remove('loading');
+        button.innerText = 'Отправить';
+      }, 1500);
     }
+
+    Telegram.WebApp.ready();
   </script>
 </body>
 </html>
