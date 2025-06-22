@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CRM WebApp</title>
   <style>
     body {
@@ -17,57 +17,81 @@
       background: white;
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+      position: relative;
     }
     input, button {
       width: 100%;
       margin-top: 10px;
-      padding: 10px;
-      font-size: 1em;
+      padding: 12px;
+      font-size: 1rem;
       border-radius: 8px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
       background: #4CAF50;
       color: white;
-      border: none;
+      font-weight: bold;
       cursor: pointer;
+      border: none;
+      transition: background 0.3s ease;
     }
     button:hover {
       background: #45a049;
+    }
+    .success-message {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+      border-radius: 8px;
+      animation: fadeIn 0.7s ease-in-out;
+    }
+    .success-message.show {
+      display: block;
+    }
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(-10px); }
+      100% { opacity: 1; transform: translateY(0); }
     }
   </style>
 </head>
 <body>
   <div class="container">
-    <h2>Ввод данных клиента</h2>
-    <form id="client-form">
-      <input type="text" id="name" placeholder="Имя клиента" required />
-      <input type="tel" id="phone" placeholder="Телефон" required />
-      <input type="email" id="email" placeholder="Email" required />
-      <button type="submit">Отправить</button>
-    </form>
+    <h2 style="text-align: center;">Ввод данных клиента</h2>
+    <input type="text" id="name" placeholder="Имя" required>
+    <input type="text" id="phone" placeholder="Телефон" required>
+    <input type="email" id="email" placeholder="Email" required>
+    <button onclick="submitData()">Отправить</button>
+    <div id="success" class="success-message">
+      ✅ Данные успешно сохранены!
+    </div>
   </div>
 
   <script>
-    const tg = window.Telegram.WebApp;
-    const form = document.getElementById("client-form");
+    function submitData() {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
-
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const email = document.getElementById("email").value;
+      if (!name || !phone || !email) {
+        alert("Пожалуйста, заполните все поля.");
+        return;
+      }
 
       const data = `${name} | ${phone} | ${email}`;
-
-      // Отправка данных обратно в Telegram бота
-      tg.sendData(data);
-
-      // Закрыть WebApp
-      tg.close();
-    });
+      if (window.Telegram.WebApp) {
+        window.Telegram.WebApp.sendData(data);
+        document.getElementById("success").classList.add("show");
+        setTimeout(() => {
+          document.getElementById("success").classList.remove("show");
+          window.Telegram.WebApp.close();
+        }, 2000);
+      }
+    }
   </script>
 </body>
 </html>
