@@ -19,46 +19,61 @@
       border-radius: 12px;
       box-shadow: 0 0 20px rgba(0,0,0,0.1);
     }
+    h2 {
+      text-align: center;
+      margin-bottom: 25px;
+    }
     input, button {
       width: 100%;
       margin-top: 10px;
-      padding: 10px;
-      font-size: 1em;
+      padding: 12px;
+      font-size: 16px;
       border-radius: 8px;
       border: 1px solid #ccc;
+      box-sizing: border-box;
     }
     button {
-      background: #4CAF50;
+      background-color: #4CAF50;
       color: white;
       border: none;
+      margin-top: 20px;
       cursor: pointer;
+      transition: background-color 0.2s ease;
     }
     button:hover {
-      background: #45a049;
-    }
-    h2 {
-      text-align: center;
+      background-color: #45a049;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <h2>Ввод данных клиента</h2>
-    <input type="text" id="name" placeholder="Имя клиента" />
-    <input type="tel" id="phone" placeholder="Телефон" />
-    <input type="email" id="email" placeholder="Email" />
-    <button onclick="sendData()">Отправить</button>
+    <input type="text" id="name" placeholder="Имя">
+    <input type="text" id="phone" placeholder="Телефон">
+    <input type="email" id="email" placeholder="Email">
+    <button id="submitBtn">Отправить</button>
   </div>
 
+  <!-- Подключение Telegram WebApp JS API -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <script>
-    function sendData() {
-      const name = document.getElementById("name").value;
-      const phone = document.getElementById("phone").value;
-      const email = document.getElementById("email").value;
+    const tg = window.Telegram.WebApp;
+    const btn = document.getElementById("submitBtn");
+
+    btn.addEventListener("click", function () {
+      const name = document.getElementById("name").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const email = document.getElementById("email").value.trim();
+
+      if (!name || !phone || !email) {
+        alert("Пожалуйста, заполните все поля");
+        return;
+      }
 
       const data = `${name} | ${phone} | ${email}`;
-      window.Telegram.WebApp.sendData(data);
-    }
+      tg.sendData(data);   // Отправка данных в Telegram бота
+      tg.close();          // Закрытие WebApp
+    });
   </script>
 </body>
 </html>
